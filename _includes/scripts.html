@@ -1,0 +1,107 @@
+<!-- jQuery -->
+<script src="js/jquery.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="js/bootstrap.min.js"></script>
+
+<!-- Plugin JavaScript -->
+<script src="js/jquery.easing.min.js"></script>
+<script src="js/jquery.fittext.js"></script>
+<script src="js/wow.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="js/creative.js"></script>
+
+<!-- Smooth scrolling and animations -->
+<script>
+$(document).ready(function() {
+    // Initialize carousel with pause
+    $('#aptCarousel').carousel({
+        interval: false,
+        pause: true,
+        wrap: true
+    });
+    
+    // Smooth scroll for anchor links
+    $('a.page-scroll').click(function(event) {
+        var target = $(this.getAttribute('href'));
+        if (target.length) {
+            event.preventDefault();
+            $('html, body').stop().animate({
+                scrollTop: target.offset().top
+            }, 1200, 'easeInOutExpo');
+        }
+    });
+    
+    // Update carousel counter
+    function updateCarouselCounter() {
+        var currentIndex = $('#aptCarousel .item.active').index() + 1;
+        $('#current-slide').text(currentIndex);
+    }
+    
+    // Update counter on slide change
+    $('#aptCarousel').on('slid.bs.carousel', function() {
+        updateCarouselCounter();
+    });
+    
+    // Carousel keyboard navigation
+    var keydownTimeout;
+    $(document).keydown(function(e) {
+        var gallerySection = $('#gallery');
+        if (gallerySection.length && isSectionVisible(gallerySection[0])) {
+            if (e.keyCode == 37) { // Left arrow
+                e.preventDefault();
+                e.stopPropagation();
+                clearTimeout(keydownTimeout);
+                keydownTimeout = setTimeout(function() {
+                    $('#aptCarousel').carousel('prev');
+                }, 50);
+            } else if (e.keyCode == 39) { // Right arrow
+                e.preventDefault();
+                e.stopPropagation();
+                clearTimeout(keydownTimeout);
+                keydownTimeout = setTimeout(function() {
+                    $('#aptCarousel').carousel('next');
+                }, 50);
+            }
+        }
+    });
+    
+    function isSectionVisible(el) {
+        var rect = el.getBoundingClientRect();
+        var windowHeight = window.innerHeight || document.documentElement.clientHeight;
+        // Check if element is at least partially visible
+        return rect.top < windowHeight && rect.bottom > 0;
+    }
+    
+    // Scroll fade-in animation with throttle
+    var scrollTimeout;
+    function checkSections() {
+        var viewportTop = $(window).scrollTop();
+        var viewportBottom = viewportTop + $(window).height();
+        var viewportMiddle = viewportTop + ($(window).height() / 2);
+        
+        $('section, aside, header').each(function() {
+            var elementTop = $(this).offset().top;
+            var elementBottom = elementTop + $(this).outerHeight();
+            var elementMiddle = elementTop + ($(this).outerHeight() / 2);
+            
+            // Show when element is near viewport center
+            if (elementMiddle > viewportTop - 200 && elementMiddle < viewportBottom + 200) {
+                $(this).addClass('section-visible').removeClass('section-hidden');
+            }
+        });
+    }
+    
+    // Initial check
+    setTimeout(function() {
+        checkSections();
+    }, 100);
+    
+    // Check on scroll with throttle for performance
+    $(window).on('scroll', function() {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(checkSections, 50);
+    });
+});
+</script>
